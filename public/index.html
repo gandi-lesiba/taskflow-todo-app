@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TaskFlow</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet" />
+
+    <style>
+        :root{
+            --bg: #0f0f11;
+            --surface: #1a1a1f;
+            --border: #2a2a32;
+            --acceent: #7c6af7;
+            --accent-dim: #4b42a0;
+            --danger: #e05263;
+            --text: #e8e8f0;
+            --muted: #7a7a90;
+            --success: #4caf88;
+            --error-bg: #3a1520;
+            --success-bg: #102820;
+            --radius: 12px;
+        }
+
+        *, *::before, ::after{
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 2rem 1rem 4rem;
+            line-height: 1.6;
+        }
+
+        /* Centred column layout */
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        /* header*/
+        header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid var(--border);
+        }
+        .logo-badge {
+            display: inline-block;
+            background: var(--accent);
+            color: #fff;
+            font: size o 0.5em;
+            font-weight: 700;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            padding: 4px 12px;
+            border-radius: 999px;
+            margin-bottom: 0.75rem;
+        }
+        h1 {
+            font-family: 'Syne', sans-serif;
+            font-size: clamp(2rem, 6vw, 3rem);
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            color: #fff;
+        }
+        h1 span { color: var(--accent); }
+        header p { color: var(--muted); margin-top: 0.5rem; font-size: 0.95rem; }  
+
+         /* ---- Section title ---- */
+    .section-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 1rem;
+    }
+
+     /* ---- Form card ---- */
+    .form-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    .input-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 1rem; }
+    label { font-size: 0.82rem; font-weight: 500; color: var(--muted); letter-spacing: 0.04em; }
+
+    input[type="text"] {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.7rem 1rem;
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.95rem;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      outline: none;
+      width: 100%;
+    }
+      /* Purple ring appears when the user clicks into an input */
+    input[type="text"]:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(124,106,247,0.2);
+    }
+       input::placeholder { color: var(--muted); opacity: 0.6; }
+
+        /* ---- Buttons ---- */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 0.65rem 1.2rem;
+      border: none;
+      border-radius: 8px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s, opacity 0.2s;
+    }
+    .btn:active { transform: scale(0.97); }
+    .btn-primary { background: var(--accent); color: #fff; width: 100%; justify-content: center; padding: 0.8rem; }
+    .btn-primary:hover { background: var(--accent-dim); }
+    .btn-danger { background: transparent; color: var(--danger); border: 1px solid var(--danger); padding: 5px 10px; font-size: 0.8rem; border-radius: 6px; flex-shrink: 0; }
+    .btn-danger:hover { background: var(--danger); color: #fff; }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+     /* ---- Task list ---- */
+    #task-list { list-style: none; display: flex; flex-direction: column; gap: 0.75rem; }
+    .task-item {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem 1.25rem;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 1rem;
+      animation: fadeSlideIn 0.25s ease forwards;
+    }
+    .task-content { flex: 1; min-width: 0; }
+    .task-id { font-size: 0.7rem; color: var(--accent); font-weight: 700; margin-bottom: 4px; letter-spacing: 0.05em; }
+    .task-title { font-weight: 500; font-size: 0.98rem; color: var(--text); margin-bottom: 4px; word-break: break-word; }
+    .task-description { font-size: 0.85rem; color: var(--muted); word-break: break-word; }
+
+      /* Empty state */
+    .empty-state { text-align: center; padding: 3rem 1rem; color: var(--muted); }
+    .empty-state .icon { font-size: 2.5rem; margin-bottom: 0.75rem; }
+    .empty-state p { font-size: 0.9rem; }
+
+     /* Feedback messages */
+    .message {
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      font-size: 0.88rem;
+      margin-bottom: 1rem;
+      display: none;
+      align-items: center;
+      gap: 8px;
+    }
+      .message.error   { background: var(--error-bg);   color: var(--danger);  border: 1px solid var(--danger);  }
+    .message.success { background: var(--success-bg);  color: var(--success); border: 1px solid var(--success); }
+    .message.visible { display: flex; }
+ 
+    /* ---- Spinner ---- */
+    .spinner { text-align: center; padding: 2rem; color: var(--muted); font-size: 0.9rem; }
+    .spinner::before {
+      content: '';
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 2px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      vertical-align: middle;
+      margin-right: 8px;
+    }
+
+     /*  Task count badge  */
+    #task-count {
+      background: var(--border);
+      color: var(--muted);
+      font-size: 0.7rem;
+      padding: 2px 8px;
+      border-radius: 999px;
+      margin-left: 6px;
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 500;
+      vertical-align: middle;
+    }
+
+     /* Animations */
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes fadeSlideIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0);   }
+    }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="logo-badge">TaskFlow</div>
+        <h1>Manage Your <span>Tasks</span></h1>
+        <p>Add, view and delete tasks for your team</p>
+        </header>
+
+        <div class="form-card">
+      <p class="section-title">Add New Task</p>
+      <div id="form-message" class="message" role="alert"></div>
+
+      <div class="input-group">
+        <label for="task-title">Task Title</label>
+        <input type="text" id="task-title" placeholder=" Review quartely report" autocomplete="off" />
+
+        <div class="input-group">
+            <label for="task-desc">Description</label>
+            <input type="text" id="task-desc" placeholder=" Read through finance team's Q2 summary" autocomplete="off" />
+        </div>
+
+        <button id="add-btn" class="btn btn-primary">+ Add Task</button>
+      </div>
+
+      <div>
+        <p class="section-title">
+            Current Tasks
+            <span id="task-count">0</span>
+        </p>
+        <div id="list-message" class="message" role="alert"></div>
+<ul id="task-list">
+    <li class="spinner">Loading tasks...</li>
+</ul>
+      </div>
+
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3000';
+
+        const taskList  = document.getElementById('task-list');
+        const taskTitle  = document.getElementById('task-title');
+        const taskDesc   = document.getElementById('task-desc');
+        const addBtn     = document.getElementById('add-btn');
+        const taskCount   = document.getElementById('task-count');
+        const formMessage = document.getElementById('form-message');
+        const listMessage = document.getElementById('list-message');
+
+        function showMessage(el, text, type) {
+            el.textContent = text;
+            el.className = `message ${type} visible`;
+            setTimeout(() => {
+                el.className = 'message';
+                el.textContent = '';
+            }, 4000);
+        }
+        function setLoading(isLoading) {
+            addBtn.disabled = isLoading;
+            addBtn.textContent = isLoading ? 'Adding...' :  '+Add Task';
+        }
+
+        function escapeHtml(str='') {
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        async function fetchTasks() {
+            taskList.innerHTML = '<li class="spinner">Loading tasks...</li>';
+            try {
+                const response = await fetch(`${API_BASE}/tasks`);
+                if (!response.ok) throw new Error(`Server error: status $ {response.status}`);
+                const tasks = await response.json();
+                renderTasks(tasks);
+        } catch (err) {
+            taskList.innerHTML = '';
+            showMessage(listMessage, 'Could not load tasks. Is the server running?', 'error');
+            console.error('fetchTasks error:', err);
+        }
+    }
+
+    function renderTasks(tasks) {
+        taskCount.textContent = tasks.length;
+        if (tasks.length === 0) {
+            taskList.innerHTML = `
+            <li class="empty-state">
+                <div class="icon">&#128203;</div>
+                <p>No tasks yet. Add your first task above!</p>
+            </li>`;
+            return;
+        }
+        taskList.innerHTML = tasks.map(task => `
+        <li class="task-item" data-id="${task.id}">
+            <div class="task-content">
+                <div class="task-id">#${task.id}</div>
+                <div class="task-title">${escapeHtml(task.title)}</div>
+                <div class="task-description">${escapeHtml(task.description)}</div>
+            </div>
+            <button class="btn btn-danger" onclick="deleteTask(${task.id})">&#128465; Delete</button>
+            </li>
+            `).join('');
+    }
+
+    async function addTask() {
+        const title  = taskTitle.value.trim();
+        const description = taskDesc.value.trim();
+        if (!title || !description) {
+            showMessage(formMessage, 'Please fill in both title and description.', 'error');
+            return;
+        }
+        setLoading(true);
+        try {
+            const response = await fetch(`${API_BASE}/tasks`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ title, description })
+            });
+            if (!response.ok) {
+                const data = await response.json();
+                throw new Error(data.error || 'Failed to add task.');
+            }
+            taskTitle.value = '';
+            taskDesc.value = '';
+            showMessage(formMessage, 'Task added successfully!', 'success');
+            await fetchTasks();
+        } catch (err) {
+            showMessage(formMessage, 'Failed to add task.', 'error');
+            console.error('addTask error:', err);
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    async function deleteTask(id) {
+        if (!confirm(`Are you sure you want to delete task #${id}?`)) return;
+        try {
+            const response = await fetch(`${API_BASE}/tasks/${id}`, { method: 'DELETE' });
+            if (!response.ok) throw new Error(`Failed to delete task #${id}.`);
+            await fetchTasks();
+        } catch (err) {
+            showMessage(listMessage, err.message, 'error');
+        }
+    }
+
+    addBtn.addEventListener('click', addTask);
+    taskTitle.addEventListener('keypress', (e) => { if (e.key === 'Enter') addTask();});
+    taskDesc.addEventListener('keypress', (e) => { if (e.key === 'Enter') addTask();});
+
+    fetchTasks();
+    </script>
+
+</body>
+</html>
